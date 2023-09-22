@@ -18,10 +18,18 @@ add_action('admin_notices', 'wpss_display_smtp_errors');
 add_action('admin_menu', 'wpss_register_smtp_settings_page');
 add_action('admin_post_wpss_send_test_email', 'wpss_handle_test_email_submission');
 
-function wpss_configure_smtp_settings(PHPMailer $phpmailer)
+/**
+ * @param \PHPMailer\PHPMailer\PHPMailer $phpmailer
+ *
+ * @return void
+ *
+ * @throws \PHPMailer\PHPMailer\Exception
+ */
+function wpss_configure_smtp_settings($phpmailer)
 {
     if (!wpss_are_required_smtp_constants_defined()) {
         wpss_add_smtp_error('Required SMTP constants are not defined in wp-config.php.');
+
         return;
     }
 
