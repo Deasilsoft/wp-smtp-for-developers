@@ -130,30 +130,30 @@ function wpss_display_smtp_settings_page_content()
 
     echo '<h4>Gmail:</h4>' . "\n";
     echo "<pre>\n";
-    echo "define('SMTP_SERVER', 'smtp.gmail.com');\n";
-    echo "define('SMTP_USERNAME', 'your-email@gmail.com');\n";
-    echo "define('SMTP_PASSWORD', 'your-gmail-password');\n";
-    echo "define('SMTP_PORT', '587');\n";
-    echo "define('SMTP_SECURE', 'tls');\n";
+    echo "define( 'SMTP_SERVER', 'smtp.gmail.com' );\n";
+    echo "define( 'SMTP_USERNAME', 'your-email@gmail.com' );\n";
+    echo "define( 'SMTP_PASSWORD', 'your-gmail-password' );\n";
+    echo "define( 'SMTP_PORT', '587' );\n";
+    echo "define( 'SMTP_SECURE', 'tls' );\n";
     echo '</pre>' . "\n";
     echo '<p>Note: Using Gmail requires allowing "less secure apps" in your Gmail settings, or you can use an "App Password".</p>' . "\n";
 
     echo '<h4>Outlook:</h4>' . "\n";
     echo "<pre>\n";
-    echo "define('SMTP_SERVER', 'smtp.office365.com');\n";
-    echo "define('SMTP_USERNAME', 'your-email@outlook.com');\n";
-    echo "define('SMTP_PASSWORD', 'your-outlook-password');\n";
-    echo "define('SMTP_PORT', '587');\n";
-    echo "define('SMTP_SECURE', 'tls');\n";
+    echo "define( 'SMTP_SERVER', 'smtp.office365.com' );\n";
+    echo "define( 'SMTP_USERNAME', 'your-email@outlook.com' );\n";
+    echo "define( 'SMTP_PASSWORD', 'your-outlook-password' );\n";
+    echo "define( 'SMTP_PORT', '587' );\n";
+    echo "define( 'SMTP_SECURE', 'tls' );\n";
     echo '</pre>' . "\n";
 
     echo '<h4>AWS SES (Simple Email Service):</h4>' . "\n";
     echo "<pre>\n";
-    echo "define('SMTP_SERVER', 'email-smtp.us-west-2.amazonaws.com'); // This may vary depending on your SES region\n";
-    echo "define('SMTP_USERNAME', 'your-ses-smtp-username');\n";
-    echo "define('SMTP_PASSWORD', 'your-ses-smtp-password');\n";
-    echo "define('SMTP_PORT', '587');\n";
-    echo "define('SMTP_SECURE', 'tls');\n";
+    echo "define( 'SMTP_SERVER', 'email-smtp.us-west-2.amazonaws.com' ); // This may vary depending on your SES region\n";
+    echo "define( 'SMTP_USERNAME', 'your-ses-smtp-username' );\n";
+    echo "define( 'SMTP_PASSWORD', 'your-ses-smtp-password' );\n";
+    echo "define( 'SMTP_PORT', '587' );\n";
+    echo "define( 'SMTP_SECURE', 'tls' );\n";
     echo '</pre>' . "\n";
     echo '<p>Note: Ensure your AWS SES account is out of the "sandbox" mode to send emails to any recipient.</p>' . "\n";
 
