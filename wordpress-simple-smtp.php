@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: WordPress Simple SMTP
  * Plugin URI: https://deasilsoft.com/
@@ -9,6 +8,11 @@
  * Author URI: https://deasilsoft.com/
  * License: MIT
  */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 add_action('phpmailer_init', 'wpss_configure_smtp_settings');
 add_action('admin_notices', 'wpss_display_smtp_errors');
 add_action('admin_menu', 'wpss_register_smtp_settings_page');
