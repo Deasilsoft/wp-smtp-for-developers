@@ -195,7 +195,7 @@ function wps4d_display_configuration_overview() {
 		'SMTP Auth'     => wps4d_get_smtp_setting( 'SMTP_AUTH' ) ? 'Yes' : 'No',
 		'SMTP Secure'   => wps4d_get_smtp_setting( 'SMTP_SECURE' ) ?: 'Not set',
 		'SMTP Port'     => wps4d_get_smtp_setting( 'SMTP_PORT' ) ?: 'Not set',
-		'SMTP Debug'    => wps4d_get_smtp_setting( 'SMTP_DEBUG' ) ?: 'Not set',
+		'SMTP Debug'    => wps4d_get_smtp_setting( 'SMTP_DEBUG' ) ?? 'Not set',
 		'SMTP From'     => wps4d_get_smtp_setting( 'SMTP_FROM' ) ?: 'Not set',
 		'SMTP Name'     => wps4d_get_smtp_setting( 'SMTP_NAME' ) ?: 'Not set',
 	];
