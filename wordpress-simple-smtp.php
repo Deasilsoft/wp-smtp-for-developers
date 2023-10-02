@@ -135,9 +135,15 @@ function wps4d_display_test_email_form() {
 
 	echo '<form method="post" action="' . admin_url( 'admin-post.php' ) . '">';
 	echo '<input type="hidden" name="action" value="wps4d_send_test_email">';
-	echo '<label for="recipient">Recipient Email: </label>';
-	echo '<input type="email" name="recipient" value="' . esc_attr( $recipient ) . '" required>';
-	echo '<input type="submit" value="Send Test Email" class="button button-primary">';
+	echo '<table class="form-table">';
+	echo '<tbody>';
+	echo '<tr>';
+	echo '<th scope="row"><label for="recipient">Recipient Email</label></th>';
+	echo '<td><input type="email" name="recipient" id="recipient" value="' . esc_attr( $recipient ) . '" class="regular-text" required></td>';
+	echo '</tr>';
+	echo '</tbody>';
+	echo '</table>';
+	echo '<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="Send Test Email"></p>';
 	echo '</form>';
 }
 
