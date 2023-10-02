@@ -39,24 +39,13 @@ function wps4d_configure_smtp_settings( $phpmailer ) {
 	$phpmailer->Username = SMTP_USERNAME;
 	$phpmailer->Password = SMTP_PASSWORD;
 
-	if ( defined( 'SMTP_PORT' ) ) {
-		$phpmailer->Port = SMTP_PORT;
-	}
-
-	if ( defined( 'SMTP_SECURE' ) ) {
-		$phpmailer->SMTPSecure = SMTP_SECURE;
-	}
+	$phpmailer->SMTPAuth   = defined( 'SMTP_AUTH' ) ? SMTP_AUTH : true;
+	$phpmailer->SMTPSecure = defined( 'SMTP_SECURE' ) ? SMTP_SECURE : 'tls';
+	$phpmailer->Port       = defined( 'SMTP_PORT' ) ? SMTP_PORT : '587';
+	$phpmailer->SMTPDebug  = defined( 'SMTP_DEBUG' ) ? SMTP_DEBUG : '0';
 
 	if ( defined( 'SMTP_FROM' ) && defined( 'SMTP_NAME' ) ) {
 		$phpmailer->setFrom( SMTP_FROM, SMTP_NAME );
-	}
-
-	if ( defined( 'SMTP_AUTH' ) ) {
-		$phpmailer->SMTPAuth = SMTP_AUTH;
-	}
-
-	if ( defined( 'SMTP_DEBUG' ) ) {
-		$phpmailer->SMTPDebug = SMTP_DEBUG;
 	}
 }
 
