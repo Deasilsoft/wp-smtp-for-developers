@@ -216,7 +216,7 @@ function wps4d_display_configuration_overview() {
 function wps4d_display_constants_overview() {
 	echo <<<HTML
 		<h2>Constants Overview:</h2>
-		<ul>
+		<ul style="list-style-type: disc; padding-left: 20px;">
 			<li><strong>SMTP_SERVER:</strong> The address of your SMTP server.</li>
 			<li><strong>SMTP_USERNAME:</strong> The username or email used to authenticate with the SMTP server.</li>
 			<li><strong>SMTP_PASSWORD:</strong> The password used to authenticate with the SMTP server.</li>
@@ -225,9 +225,8 @@ function wps4d_display_constants_overview() {
 			<li><strong>SMTP_PORT (optional):</strong> The port used by the SMTP server. Common values are 25, 465, and 587. Defaults to 587.</li>
 			<li>
 				<strong>SMTP_DEBUG (optional):</strong> Number value for debugging. Defaults to 0.
-				<br>
-				<strong>Available SMTP_DEBUG values are:</strong>
-				<ul>
+				<p><strong>Available SMTP_DEBUG values are:</strong></p>
+				<ul style="list-style-type: square; padding-left: 20px; margin: 1em 0;">
 					<li>0: No output</li>
 					<li>1: Commands</li>
 					<li>2: Data and commands</li>
