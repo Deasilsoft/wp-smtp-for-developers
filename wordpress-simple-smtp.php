@@ -88,9 +88,11 @@ function wps4d_display_smtp_errors() {
 	}
 
 	foreach ( $errors as $error ) {
-		echo '<div class="notice notice-error is-dismissible">';
-		echo '<p><strong>SMTP Error:</strong> ' . esc_html( $error ) . '</p>';
-		echo '</div>';
+		echo <<<HTML
+			<div class="notice notice-error is-dismissible">
+				<p><strong>SMTP Error:</strong> {esc_html($error)}</p>
+			</div>
+			HTML;
 	}
 
 	delete_transient( 'wps4d_smtp_errors' );
@@ -119,36 +121,54 @@ function wps4d_display_smtp_settings_page_content() {
 }
 
 function wps4d_display_test_email_form() {
-	echo '<h2>Send Test Mail</h2>';
+	$recipient = isset( $_GET['recipient'] ) ? sanitize_email( $_GET['recipient'] ) : '';
+	$sent      = isset( $_GET['sent'] ) ? (bool) $_GET['sent'] : null;
+
+	$nonce_field = wp_nonce_field( 'wps4d_test_email_nonce', '_wpnonce', true, false );
+	$admin_url   = admin_url( 'admin-post.php' );
+	$notice      = "";
 
 	if ( ! wps4d_are_required_smtp_constants_defined() ) {
-		echo '<p><strong>Cannot send test email:</strong> Required SMTP constants are not defined.</p>';
+		echo <<<HTML
+			<h2>Send Test Mail</h2>
+			<p><strong>Cannot send test email:</strong> Required SMTP constants are not defined.</p>
+			HTML;
 
 		return;
 	}
-
-	$recipient = isset( $_GET['recipient'] ) ? sanitize_email( $_GET['recipient'] ) : '';
-	$sent      = isset( $_GET['sent'] ) ? (bool) $_GET['sent'] : null;
 
 	if ( isset( $sent ) ) {
 		$message = $sent ? 'Test email sent successfully!' : 'Failed to send test email.';
 		$class   = $sent ? 'notice-success' : 'notice-error';
 
-		echo "<div class='notice {$class} is-dismissible'><p>{$message}</p></div>";
+		$notice = <<<HTML
+			<div class='notice {$class} is-dismissible' role='alert'>
+				<p>{$message}</p>
+			</div>
+			HTML;
 	}
 
-	echo '<form method="post" action="' . admin_url( 'admin-post.php' ) . '">';
-	echo '<input type="hidden" name="action" value="wps4d_send_test_email">';
-	echo '<table class="form-table">';
-	echo '<tbody>';
-	echo '<tr>';
-	echo '<th scope="row"><label for="recipient">Recipient Email</label></th>';
-	echo '<td><input type="email" name="recipient" id="recipient" value="' . esc_attr( $recipient ) . '" class="regular-text" required></td>';
-	echo '</tr>';
-	echo '</tbody>';
-	echo '</table>';
-	echo '<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="Send Test Email"></p>';
-	echo '</form>';
+	echo <<<HTML
+		<h2>Send Test Mail</h2>
+		{$notice}
+		<form method="post" action="{$admin_url}">
+			<input type="hidden" name="action" value="wps4d_send_test_email">
+			{$nonce_field}
+			<table class="form-table">
+				<tbody>
+					<tr>
+						<th scope="row"><label for="recipient">Recipient Email</label></th>
+						<td><input type="email" name="recipient" id="recipient" value="{$recipient}" class="regular-text" required></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="Send Test Email"></p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+		HTML;
 }
 
 function wps4d_handle_test_email_submission() {
@@ -173,67 +193,89 @@ function wps4d_handle_wp_mail_failure( $wp_error ) {
 
 function wps4d_display_configuration_overview() {
 	$settings = [
-		'SMTP Server'   => wps4d_get_smtp_setting( 'SMTP_SERVER' ) ? wps4d_get_smtp_setting( 'SMTP_SERVER' ) : 'Not set',
-		'SMTP Username' => wps4d_get_smtp_setting( 'SMTP_USERNAME' ) ? wps4d_get_smtp_setting( 'SMTP_USERNAME' ) : 'Not set',
+		'SMTP Server'   => wps4d_get_smtp_setting( 'SMTP_SERVER' ) ?: 'Not set',
+		'SMTP Username' => wps4d_get_smtp_setting( 'SMTP_USERNAME' ) ?: 'Not set',
 		'SMTP Password' => wps4d_get_smtp_setting( 'SMTP_PASSWORD' ) ? '********' : 'Not set',
-		'SMTP Port'     => wps4d_get_smtp_setting( 'SMTP_PORT' ) ? wps4d_get_smtp_setting( 'SMTP_PORT' ) : 'Not set',
-		'SMTP Secure'   => wps4d_get_smtp_setting( 'SMTP_SECURE' ) ? wps4d_get_smtp_setting( 'SMTP_SECURE' ) : 'Not set',
-		'SMTP From'     => wps4d_get_smtp_setting( 'SMTP_FROM' ) ? wps4d_get_smtp_setting( 'SMTP_FROM' ) : 'Not set',
-		'SMTP Name'     => wps4d_get_smtp_setting( 'SMTP_NAME' ) ? wps4d_get_smtp_setting( 'SMTP_NAME' ) : 'Not set',
+		'SMTP Auth'     => wps4d_get_smtp_setting( 'SMTP_AUTH' ) ? 'Yes' : 'No',
+		'SMTP Secure'   => wps4d_get_smtp_setting( 'SMTP_SECURE' ) ?: 'Not set',
+		'SMTP Port'     => wps4d_get_smtp_setting( 'SMTP_PORT' ) ?: 'Not set',
+		'SMTP Debug'    => wps4d_get_smtp_setting( 'SMTP_DEBUG' ) ?: 'Not set',
+		'SMTP From'     => wps4d_get_smtp_setting( 'SMTP_FROM' ) ?: 'Not set',
+		'SMTP Name'     => wps4d_get_smtp_setting( 'SMTP_NAME' ) ?: 'Not set',
 	];
 
 	echo '<h2>Configuration Overview</h2>';
 	echo '<table class="form-table">';
 
 	foreach ( $settings as $name => $value ) {
-		echo "<tr><th>{$name}</th><td>{$value}</td></tr>";
+		$display_name  = esc_html( $name );
+		$display_value = esc_html( $value );
+
+		echo "<tr><th>{$display_name}</th><td>{$display_value}</td></tr>";
 	}
 
 	echo '</table>';
 }
 
 function wps4d_display_constants_overview() {
-	echo '<h2>Constants Overview:</h2>';
-	echo '<ul>';
-	echo '<li><strong>SMTP_SERVER:</strong> The address of your SMTP server.</li>';
-	echo '<li><strong>SMTP_USERNAME:</strong> The username or email used to authenticate with the SMTP server.</li>';
-	echo '<li><strong>SMTP_PASSWORD:</strong> The password used to authenticate with the SMTP server.</li>';
-	echo '<li><strong>SMTP_PORT (optional):</strong> The port used by the SMTP server. Common values are 25, 465, and 587.</li>';
-	echo '<li><strong>SMTP_SECURE (optional):</strong> Encryption method. Can be "tls", "ssl", or omitted.</li>';
-	echo '<li><strong>SMTP_FROM (optional):</strong> The email address that emails will be sent from.</li>';
-	echo '<li><strong>SMTP_NAME (optional):</strong> The name that emails will be sent from.</li>';
-	echo '</ul>';
+	echo <<<HTML
+		<h2>Constants Overview:</h2>
+		<ul>
+			<li><strong>SMTP_SERVER:</strong> The address of your SMTP server.</li>
+			<li><strong>SMTP_USERNAME:</strong> The username or email used to authenticate with the SMTP server.</li>
+			<li><strong>SMTP_PASSWORD:</strong> The password used to authenticate with the SMTP server.</li>
+			<li><strong>SMTP_AUTH (optional):</strong> Whether to use SMTP authentication, or not. Defaults to true.</li>
+			<li><strong>SMTP_SECURE (optional):</strong> Encryption method. Can be "tls", "ssl", or omitted. Defaults to "tls".</li>
+			<li><strong>SMTP_PORT (optional):</strong> The port used by the SMTP server. Common values are 25, 465, and 587. Defaults to 587.</li>
+			<li>
+				<strong>SMTP_DEBUG (optional):</strong> Number value for debugging. Defaults to 0.
+				<br>
+				<strong>Available SMTP_DEBUG values are:</strong>
+				<ul>
+					<li>0: No output</li>
+					<li>1: Commands</li>
+					<li>2: Data and commands</li>
+					<li>3: As 2 plus connection status</li>
+					<li>4: Low-level data output</li>
+				</ul>
+			</li>
+			<li><strong>SMTP_FROM (optional):</strong> The email address that emails will be sent from. Requires SMTP_NAME to be set.</li>
+			<li><strong>SMTP_NAME (optional):</strong> The name that emails will be sent from. Requires SMTP_FROM to be set.</li>
+		</ul>
+		HTML;
 }
 
 function wps4d_display_example_configurations() {
-	echo '<h2>Example Configurations:</h2>';
-
-	echo '<h3>Gmail:</h3>';
-	echo "<pre>";
-	echo "define( 'SMTP_SERVER', 'smtp.gmail.com' );\n";
-	echo "define( 'SMTP_USERNAME', 'your-email@gmail.com' );\n";
-	echo "define( 'SMTP_PASSWORD', 'your-gmail-password' );\n";
-	echo "define( 'SMTP_PORT', '587' );\n";
-	echo "define( 'SMTP_SECURE', 'tls' );\n";
-	echo '</pre>';
-	echo '<p>Note: Using Gmail requires allowing "less secure apps" in your Gmail settings, or you can use an "App Password".</p>';
-
-	echo '<h3>Outlook:</h3>';
-	echo "<pre>";
-	echo "define( 'SMTP_SERVER', 'smtp.office365.com' );\n";
-	echo "define( 'SMTP_USERNAME', 'your-email@outlook.com' );\n";
-	echo "define( 'SMTP_PASSWORD', 'your-outlook-password' );\n";
-	echo "define( 'SMTP_PORT', '587' );\n";
-	echo "define( 'SMTP_SECURE', 'tls' );\n";
-	echo '</pre>';
-
-	echo '<h3>AWS SES (Simple Email Service):</h3>';
-	echo "<pre>";
-	echo "define( 'SMTP_SERVER', 'email-smtp.us-west-2.amazonaws.com' );\n";
-	echo "define( 'SMTP_USERNAME', 'your-ses-smtp-username' );\n";
-	echo "define( 'SMTP_PASSWORD', 'your-ses-smtp-password' );\n";
-	echo "define( 'SMTP_PORT', '587' );\n";
-	echo "define( 'SMTP_SECURE', 'tls' );\n";
-	echo '</pre>';
-	echo '<p>Note: Ensure your AWS SES account is out of the "sandbox" mode to send emails to any recipient.</p>';
+	echo <<<HTML
+		<h2>Example Configurations:</h2>
+		
+		<h3>Gmail:</h3>
+		<pre>
+		define( 'SMTP_SERVER', 'smtp.gmail.com' );
+		define( 'SMTP_USERNAME', 'your-email@gmail.com' );
+		define( 'SMTP_PASSWORD', 'your-gmail-password' );
+		define( 'SMTP_PORT', '587' );
+		define( 'SMTP_SECURE', 'tls' );
+		</pre>
+		<p>Note: Using Gmail requires allowing "less secure apps" in your Gmail settings, or you can use an "App Password".</p>
+		
+		<h3>Outlook:</h3>
+		<pre>
+		define( 'SMTP_SERVER', 'smtp.office365.com' );
+		define( 'SMTP_USERNAME', 'your-email@outlook.com' );
+		define( 'SMTP_PASSWORD', 'your-outlook-password' );
+		define( 'SMTP_PORT', '587' );
+		define( 'SMTP_SECURE', 'tls' );
+		</pre>
+		
+		<h3>AWS SES (Simple Email Service):</h3>
+		<pre>
+		define( 'SMTP_SERVER', 'email-smtp.us-west-2.amazonaws.com' );
+		define( 'SMTP_USERNAME', 'your-ses-smtp-username' );
+		define( 'SMTP_PASSWORD', 'your-ses-smtp-password' );
+		define( 'SMTP_PORT', '587' );
+		define( 'SMTP_SECURE', 'tls' );
+		</pre>
+		<p>Note: Ensure your AWS SES account is out of the "sandbox" mode to send emails to any recipient.</p>
+		HTML;
 }
