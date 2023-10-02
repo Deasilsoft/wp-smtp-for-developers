@@ -160,13 +160,9 @@ function wps4d_display_test_email_form() {
 						<th scope="row"><label for="recipient">Recipient Email</label></th>
 						<td><input type="email" name="recipient" id="recipient" value="{$recipient}" class="regular-text" required></td>
 					</tr>
-					<tr>
-						<td colspan="2">
-							<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="Send Test Email"></p>
-						</td>
-					</tr>
 				</tbody>
 			</table>
+			<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="Send Test Email"></p>
 		</form>
 		HTML;
 }
