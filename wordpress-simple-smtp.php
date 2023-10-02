@@ -17,6 +17,7 @@ add_action( 'phpmailer_init', 'wps4d_configure_smtp_settings' );
 add_action( 'admin_notices', 'wps4d_display_smtp_errors' );
 add_action( 'admin_menu', 'wps4d_register_smtp_settings_page' );
 add_action( 'admin_post_wps4d_send_test_email', 'wps4d_handle_test_email_submission' );
+add_action( 'wp_mail_failed', 'wps4d_handle_wp_mail_failure' );
 
 /**
  * @param \PHPMailer\PHPMailer\PHPMailer $phpmailer
@@ -154,6 +155,10 @@ function wps4d_handle_test_email_submission() {
 	wp_redirect( add_query_arg( [ 'sent' => $sent ? '1' : '0', 'recipient' => $recipient ], wp_get_referer() ) );
 
 	exit;
+}
+
+function wps4d_handle_wp_mail_failure( $wp_error ) {
+	wps4d_add_smtp_error( 'Mailer Error: ' . $wp_error->get_error_message() );
 }
 
 function wps4d_display_configuration_overview() {
