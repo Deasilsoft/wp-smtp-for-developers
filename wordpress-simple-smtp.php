@@ -19,6 +19,22 @@ add_action( 'admin_menu', 'wps4d_register_smtp_settings_page' );
 add_action( 'admin_post_wps4d_send_test_email', 'wps4d_handle_test_email_submission' );
 add_action( 'wp_mail_failed', 'wps4d_handle_wp_mail_failure' );
 
+function wps4d_get_smtp_setting( $key ) {
+	$default_settings = [
+		'SMTP_SERVER'   => null,
+		'SMTP_USERNAME' => null,
+		'SMTP_PASSWORD' => null,
+		'SMTP_AUTH'     => true,
+		'SMTP_SECURE'   => 'tls',
+		'SMTP_PORT'     => '587',
+		'SMTP_DEBUG'    => '0',
+		'SMTP_FROM'     => null,
+		'SMTP_NAME'     => null,
+	];
+
+	return defined( $key ) ? constant( $key ) : $default_settings[ $key ] ?? null;
+}
+
 /**
  * @param \PHPMailer\PHPMailer\PHPMailer $phpmailer
  *
@@ -35,17 +51,16 @@ function wps4d_configure_smtp_settings( $phpmailer ) {
 
 	$phpmailer->isSMTP();
 
-	$phpmailer->Host     = SMTP_SERVER;
-	$phpmailer->Username = SMTP_USERNAME;
-	$phpmailer->Password = SMTP_PASSWORD;
+	$phpmailer->Host       = wps4d_get_smtp_setting( 'SMTP_SERVER' );
+	$phpmailer->Username   = wps4d_get_smtp_setting( 'SMTP_USERNAME' );
+	$phpmailer->Password   = wps4d_get_smtp_setting( 'SMTP_PASSWORD' );
+	$phpmailer->SMTPAuth   = wps4d_get_smtp_setting( 'SMTP_AUTH' );
+	$phpmailer->SMTPSecure = wps4d_get_smtp_setting( 'SMTP_SECURE' );
+	$phpmailer->Port       = wps4d_get_smtp_setting( 'SMTP_PORT' );
+	$phpmailer->SMTPDebug  = wps4d_get_smtp_setting( 'SMTP_DEBUG' );
 
-	$phpmailer->SMTPAuth   = defined( 'SMTP_AUTH' ) ? SMTP_AUTH : true;
-	$phpmailer->SMTPSecure = defined( 'SMTP_SECURE' ) ? SMTP_SECURE : 'tls';
-	$phpmailer->Port       = defined( 'SMTP_PORT' ) ? SMTP_PORT : '587';
-	$phpmailer->SMTPDebug  = defined( 'SMTP_DEBUG' ) ? SMTP_DEBUG : '0';
-
-	if ( defined( 'SMTP_FROM' ) && defined( 'SMTP_NAME' ) ) {
-		$phpmailer->setFrom( SMTP_FROM, SMTP_NAME );
+	if ( wps4d_get_smtp_setting( 'SMTP_FROM' ) && wps4d_get_smtp_setting( 'SMTP_NAME' ) ) {
+		$phpmailer->setFrom( wps4d_get_smtp_setting( 'SMTP_FROM' ), wps4d_get_smtp_setting( 'SMTP_NAME' ) );
 	}
 }
 
@@ -158,13 +173,13 @@ function wps4d_handle_wp_mail_failure( $wp_error ) {
 
 function wps4d_display_configuration_overview() {
 	$settings = [
-		'SMTP Server'   => defined( 'SMTP_SERVER' ) ? SMTP_SERVER : 'Not set',
-		'SMTP Username' => defined( 'SMTP_USERNAME' ) ? SMTP_USERNAME : 'Not set',
-		'SMTP Password' => defined( 'SMTP_PASSWORD' ) ? '********' : 'Not set',
-		'SMTP Port'     => defined( 'SMTP_PORT' ) ? SMTP_PORT : 'Not set',
-		'SMTP Secure'   => defined( 'SMTP_SECURE' ) ? SMTP_SECURE : 'Not set',
-		'SMTP From'     => defined( 'SMTP_FROM' ) ? SMTP_FROM : 'Not set',
-		'SMTP Name'     => defined( 'SMTP_NAME' ) ? SMTP_NAME : 'Not set'
+		'SMTP Server'   => wps4d_get_smtp_setting( 'SMTP_SERVER' ) ? wps4d_get_smtp_setting( 'SMTP_SERVER' ) : 'Not set',
+		'SMTP Username' => wps4d_get_smtp_setting( 'SMTP_USERNAME' ) ? wps4d_get_smtp_setting( 'SMTP_USERNAME' ) : 'Not set',
+		'SMTP Password' => wps4d_get_smtp_setting( 'SMTP_PASSWORD' ) ? '********' : 'Not set',
+		'SMTP Port'     => wps4d_get_smtp_setting( 'SMTP_PORT' ) ? wps4d_get_smtp_setting( 'SMTP_PORT' ) : 'Not set',
+		'SMTP Secure'   => wps4d_get_smtp_setting( 'SMTP_SECURE' ) ? wps4d_get_smtp_setting( 'SMTP_SECURE' ) : 'Not set',
+		'SMTP From'     => wps4d_get_smtp_setting( 'SMTP_FROM' ) ? wps4d_get_smtp_setting( 'SMTP_FROM' ) : 'Not set',
+		'SMTP Name'     => wps4d_get_smtp_setting( 'SMTP_NAME' ) ? wps4d_get_smtp_setting( 'SMTP_NAME' ) : 'Not set',
 	];
 
 	echo '<h2>Configuration Overview</h2>';
